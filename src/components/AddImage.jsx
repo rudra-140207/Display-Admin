@@ -10,10 +10,6 @@ const AddImage = () => {
   const [showToast, setShowToast] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
 
-  const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dkdce4jxr/image/upload";
-  // const backendUrl = "http://localhost:5000";
-  const backendUrl = "https://kiet-display-backend.onrender.com";
-
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
@@ -36,7 +32,7 @@ const AddImage = () => {
     formData.append("resource_type", "image");
 
     try {
-      const res = await axios.post(CLOUDINARY_URL, formData);
+      const res = await axios.post(import.meta.env.VITE_CLOUDINARY_URL, formData);
       const uploadedImageUrl = res.data.secure_url;
       setImageUrl(uploadedImageUrl);
 
@@ -50,7 +46,7 @@ const AddImage = () => {
 
   const uploadImageToDatabase = async (name, url) => {
     try {
-      await axios.post(`${backendUrl}/api/images`, { name, imageUrl: url });
+      await axios.post(`${import.meta.env.VITE_baseUrl}/api/images`, { name, imageUrl: url });
       showToastMessage("Image uploaded successfully!", "success");
     } catch (error) {
       showToastMessage("Failed to save image in the database.", "error");

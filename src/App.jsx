@@ -10,10 +10,10 @@ const App = () => {
     <Router>
       <div className="min-h-screen bg-gray-100">
         <nav className="bg-blue-500 p-4 text-white flex justify-around">
-          <NavLink to="/" className="text-lg">Home</NavLink>
-          <NavLink to="/add-activity" className="text-lg">Add Activity</NavLink>
-          <NavLink to="/add-image" className="text-lg">Add Image</NavLink>
-          <NavLink to="/notification" className="text-lg">Notification</NavLink>
+          <NavLink to="/" className="text-sm md:text-lg">Home</NavLink>
+          <NavLink to="/add-activity" className="text-sm md:text-lg">Add Activity</NavLink>
+          <NavLink to="/add-image" className="text-sm md:text-lg">Add Image</NavLink>
+          <NavLink to="/notification" className="text-sm md:text-lg">Notification</NavLink>
         </nav>
         <div className="container mx-auto p-4">
           <Routes>

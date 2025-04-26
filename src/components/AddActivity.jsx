@@ -8,21 +8,19 @@ const AddActivity = () => {
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // State for error message
-  const [successMessage, setSuccessMessage] = useState(""); // State for success message
-  const [showToast, setShowToast] = useState(false); // State for showing the toast message
-  // const baseUrl = "http://localhost:5000";
-  const baseUrl = "https://kiet-display-backend.onrender.com";
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(""); // Reset previous error message
-    setSuccessMessage(""); // Reset previous success message
-    setShowToast(false); // Reset toast visibility
+    setErrorMessage(""); 
+    setSuccessMessage(""); 
+    setShowToast(false); 
 
     try {
-      await axios.post(`${baseUrl}/api/activities`, {
+      await axios.post(`${import.meta.env.VITE_baseUrl}/api/activities`, {
         name,
         year,
         startDate,
@@ -31,24 +29,23 @@ const AddActivity = () => {
       });
 
       setSuccessMessage("Activity added successfully!");
-      setShowToast(true); // Show the success toast
+      setShowToast(true);
 
-      // Clear form fields
+   
       setName("");
       setYear("");
       setStartDate("");
       setEndDate("");
       setDescription("");
 
-      // Hide the toast after 4 seconds
       setTimeout(() => {
         setShowToast(false);
       }, 4000);
     } catch (err) {
       setErrorMessage("Failed to add activity. Please try again.");
-      setShowToast(true); // Show the error toast
+      setShowToast(true);
 
-      // Hide the toast after 4 seconds
+    
       setTimeout(() => {
         setShowToast(false);
       }, 4000);
