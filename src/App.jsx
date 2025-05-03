@@ -5,18 +5,13 @@ import AddActivity from "./components/AddActivity";
 import AddImage from "./components/AddImage";
 import Notification from "./components/Notification";
 import UploadPdf from "./components/UploadPdf";
+import NavBar from "./common/NavBar";
 
 const App = () => {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <nav className="bg-blue-500 p-4 text-white flex justify-around">
-          <NavLink to="/" className="text-sm md:text-lg">Home</NavLink>
-          <NavLink to="/add-activity" className="text-sm md:text-lg">Add Activity</NavLink>
-          <NavLink to="/upload-pdf" className="text-sm md:text-lg">Upload PDF</NavLink>
-          <NavLink to="/add-image" className="text-sm md:text-lg">Add Image</NavLink>
-          <NavLink to="/notification" className="text-sm md:text-lg">Notification</NavLink>
-        </nav>
+        <NavBar />
         <div className="container mx-auto p-4">
           <Routes>
             <Route path="/" element={<Home />} />
