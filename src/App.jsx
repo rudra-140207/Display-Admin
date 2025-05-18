@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import AddActivity from "./components/AddActivity";
 import AddImage from "./components/AddImage";
 import Notification from "./components/Notification";
+import AcControl from "./components/AcControl";
 import UploadPdf from "./components/UploadPdf";
 import NavBar from "./common/NavBar";
 
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/upload-pdf" element={<UploadPdf />} />
             <Route path="/add-image" element={<AddImage />} />
             <Route path="/notification" element={<Notification />} />
+            <Route path="/ac-control" element={<AcControl />} />
           </Routes>
         </div>
       </div>

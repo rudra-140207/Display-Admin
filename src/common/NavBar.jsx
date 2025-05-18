@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import logo from '../assets/logo.png'; 
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,11 +18,39 @@ const NavBar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6">
-          <NavLink to="/" className="text-sm md:text-lg hover:underline">Home</NavLink>
-          <NavLink to="/add-activity" className="text-sm md:text-lg hover:underline">Add Activity</NavLink>
-          <NavLink to="/upload-pdf" className="text-sm md:text-lg hover:underline">Upload PDF</NavLink>
-          <NavLink to="/add-image" className="text-sm md:text-lg hover:underline">Add Image</NavLink>
-          <NavLink to="/notification" className="text-sm md:text-lg hover:underline">Notification</NavLink>
+          <NavLink to="/" className="text-sm md:text-lg hover:underline">
+            Home
+          </NavLink>
+          <NavLink
+            to="/add-activity"
+            className="text-sm md:text-lg hover:underline"
+          >
+            Add Activity
+          </NavLink>
+          <NavLink
+            to="/upload-pdf"
+            className="text-sm md:text-lg hover:underline"
+          >
+            Upload PDF
+          </NavLink>
+          <NavLink
+            to="/add-image"
+            className="text-sm md:text-lg hover:underline"
+          >
+            Add Image
+          </NavLink>
+          <NavLink
+            to="/notification"
+            className="text-sm md:text-lg hover:underline"
+          >
+            Notification
+          </NavLink>
+          <NavLink
+            to="/ac-control"
+            className="text-sm md:text-lg hover:underline"
+          >
+            AC - Control
+          </NavLink>
         </div>
 
         {/* Mobile Menu Button */}
@@ -34,11 +62,41 @@ const NavBar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden mt-2 space-y-2">
-          <NavLink to="/" onClick={toggleMenu} className="block text-sm hover:underline">Home</NavLink>
-          <NavLink to="/add-activity" onClick={toggleMenu} className="block text-sm hover:underline">Add Activity</NavLink>
-          <NavLink to="/upload-pdf" onClick={toggleMenu} className="block text-sm hover:underline">Upload PDF</NavLink>
-          <NavLink to="/add-image" onClick={toggleMenu} className="block text-sm hover:underline">Add Image</NavLink>
-          <NavLink to="/notification" onClick={toggleMenu} className="block text-sm hover:underline">Notification</NavLink>
+          <NavLink
+            to="/"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/add-activity"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            Add Activity
+          </NavLink>
+          <NavLink
+            to="/upload-pdf"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            Upload PDF
+          </NavLink>
+          <NavLink
+            to="/add-image"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            Add Image
+          </NavLink>
+          <NavLink
+            to="/notification"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            Notification
+          </NavLink>
         </div>
       )}
     </nav>
