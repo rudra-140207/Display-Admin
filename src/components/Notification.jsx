@@ -10,7 +10,6 @@ const Notification = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
-  const baseUrl = "https://kiet-en-notify.onrender.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +19,7 @@ const Notification = () => {
     setShowToast(false);
 
     try {
-      await axios.post(`${baseUrl}/api/notification`, {
+      await axios.post(`${import.meta.env.VITE_baseUrl}/api/notification`, {
         sender,
         receiver,
         message,
