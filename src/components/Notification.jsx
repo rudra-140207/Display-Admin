@@ -3,13 +3,24 @@ import axios from "axios";
 
 const Notification = () => {
   const [sender, setSender] = useState("HOD");
-  const [receiver, setReceiver] = useState("");
+  const [receiver, setReceiver] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
+  const receiverOptions = [
+    "ALL",
+    "1-a",
+    "1-b",
+    "2-a",
+    "2-b",
+    "3-a",
+    "3-b",
+    "4-a",
+    "4-b",
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +32,7 @@ const Notification = () => {
     try {
       await axios.post(`${import.meta.env.VITE_baseUrl}/api/notification`, {
         sender,
-        receiver,
+        receivers: receiver,
         message,
       });
 
@@ -61,7 +72,10 @@ const Notification = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-white shadow-lg p-6 rounded">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-lg mx-auto bg-white shadow-lg p-6 rounded"
+      >
         <div className="mb-4">
           <label className="block mb-1 font-semibold">Sender</label>
           <input
@@ -75,23 +89,27 @@ const Notification = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold">Receiver</label>
-          <select
-            value={receiver}
-            onChange={(e) => setReceiver(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          >
-            <option value="">Select Receiver</option>
-            <option value="1-a">1-a</option>
-            <option value="1-b">1-b</option>
-            <option value="2-a">2-a</option>
-            <option value="2-b">2-b</option>
-            <option value="3-a">3-a</option>
-            <option value="3-b">3-b</option>
-            <option value="4-a">4-a</option>
-            <option value="4-b">4-b</option>
-          </select>
+          <label className="block mb-1 font-semibold">Receiver(s)</label>
+          <div className="grid grid-cols-2 gap-2">
+            {receiverOptions.map((option) => (
+              <label key={option} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={receiver.includes(option)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (e.target.checked) {
+                      setReceiver([...receiver, value]);
+                    } else {
+                      setReceiver(receiver.filter((r) => r !== value));
+                    }
+                  }}
+                />
+                <span>{option}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="mb-4">
