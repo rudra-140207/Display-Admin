@@ -17,7 +17,7 @@ const NavBar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-8 md:mr-12">
           <NavLink to="/" className="text-sm md:text-lg hover:underline">
             Home
           </NavLink>
@@ -96,6 +96,13 @@ const NavBar = () => {
             className="block text-sm hover:underline"
           >
             Notification
+          </NavLink>
+          <NavLink
+            to="/ac-control"
+            onClick={toggleMenu}
+            className="block text-sm hover:underline"
+          >
+            AC Control
           </NavLink>
         </div>
       )}
