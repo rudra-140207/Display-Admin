@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
+import axios from "axios";
+import { useEffect } from "react";
 
 const Login = () => {
   const [userType, setUserType] = useState("");
@@ -10,6 +12,15 @@ const Login = () => {
   const [showToast, setShowToast] = useState(false);
 
   const navigate = useNavigate();
+
+  const wakeUpBackend = async ()=>{
+    const response = await axios.get(`${import.meta.env.VITE_baseUrl}/wakeup`)
+    console.log(response.data)
+  }
+
+  useEffect(() => {
+    wakeUpBackend()
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
