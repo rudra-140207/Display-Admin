@@ -57,7 +57,7 @@ const AddActivity = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-100 p-5">
+    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-purple-300 p-5">
       <h1 className="text-3xl font-bold mb-4">Add Activity</h1>
 
       {/* Toast Notification */}

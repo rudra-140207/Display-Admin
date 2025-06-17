@@ -42,25 +42,27 @@ const UploadPdf = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">Upload Academic Calendar</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-          className="w-full border p-2 rounded"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? "Processing..." : "Upload & Extract Activities"}
-        </button>
-      </form>
-      {responseMsg && <p className="mt-4 text-center">{responseMsg}</p>}
-      {text && <p className="mt-4 text-center">{text}</p>}
+    <div className="bg-gradient-to-br from-blue-300 to-purple-300 min-h-screen p-4">
+      <div className="max-w-md mx-auto p-6 bg-gradient-to-br from-blue-200 to-purple-200 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Upload Academic Calendar</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileChange}
+            className="w-full border p-2 rounded"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? "Processing..." : "Upload & Extract Activities"}
+          </button>
+        </form>
+        {responseMsg && <p className="mt-4 text-center">{responseMsg}</p>}
+        {text && <p className="mt-4 text-center">{text}</p>}
+      </div>
     </div>
   );
 };

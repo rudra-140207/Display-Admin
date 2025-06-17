@@ -51,6 +51,15 @@ const NavBar = () => {
           >
             AC - Control
           </NavLink>
+          <NavLink
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.reload();
+            }}
+            className="text-sm md:text-lg hover:underline"
+          >
+            LogOut
+          </NavLink>
         </div>
 
         {/* Mobile Menu Button */}
@@ -103,6 +112,15 @@ const NavBar = () => {
             className="block text-sm hover:underline"
           >
             AC Control
+          </NavLink>
+          <NavLink
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.reload();
+            }}
+            className="block text-sm hover:underline"
+          >
+            LogOut
           </NavLink>
         </div>
       )}

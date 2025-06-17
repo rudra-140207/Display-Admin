@@ -64,7 +64,7 @@ const AddImage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-5">
+    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-purple-300 p-5">
       <h1 className="text-3xl font-bold mb-4">Add Image</h1>
 
       {showToast && (
@@ -84,13 +84,13 @@ const AddImage = () => {
         placeholder="Enter Image Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
+        className="w-full md:w-1/4 p-2 border rounded m-2"
       />
 
       <input
         type="file"
         onChange={handleImageChange}
-        className="w-full p-2 border rounded mb-2"
+        className="w-full md:w-1/4 p-2 border rounded m-2"
       />
 
       <button

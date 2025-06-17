@@ -59,7 +59,7 @@ const Notification = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 p-5">
+    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-purple-300 p-5">
       <h1 className="text-3xl font-bold mb-4">Send Notification</h1>
 
       {showToast && (
@@ -74,7 +74,7 @@ const Notification = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="max-w-lg mx-auto bg-white shadow-lg p-6 rounded"
+        className="max-w-lg mx-auto bg-gradient-to-br from-blue-200 to-purple-200 shadow-lg p-6 rounded"
       >
         <div className="mb-4">
           <label className="block mb-1 font-semibold">Sender</label>

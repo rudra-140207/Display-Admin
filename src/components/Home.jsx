@@ -87,7 +87,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-100 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-300 to-purple-300 p-6">
       {/* Toast */}
       {showToast && (
         <div

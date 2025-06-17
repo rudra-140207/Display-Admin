@@ -1,29 +1,84 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import AddActivity from "./components/AddActivity";
 import AddImage from "./components/AddImage";
 import Notification from "./components/Notification";
 import AcControl from "./components/AcControl";
 import UploadPdf from "./components/UploadPdf";
-import NavBar from "./common/NavBar";
+import Login from "./components/Login";
+import MainLayout from "./common/MainLayout";
+import PrivateRoute from "./common/PrivateRoute";
 
 const App = () => {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
-        <NavBar />
-        <div className="container mx-auto p-4">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/add-activity" element={<AddActivity />} />
-            <Route path="/upload-pdf" element={<UploadPdf />} />
-            <Route path="/add-image" element={<AddImage />} />
-            <Route path="/notification" element={<Notification />} />
-            <Route path="/ac-control" element={<AcControl />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Private routes inside PrivateRoute */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/add-activity"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <AddActivity />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/upload-pdf"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <UploadPdf />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/add-image"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <AddImage />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/notification"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Notification />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ac-control"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <AcControl />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+      </Routes>
     </Router>
   );
 };
