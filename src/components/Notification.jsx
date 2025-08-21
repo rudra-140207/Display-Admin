@@ -61,8 +61,8 @@ const Notification = () => {
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        // 10MB limit for images
+      if (file.size > 200 * 1024 * 1024) {
+        // 200MB
         showToastMessage("Image file must be less than 10MB", "error");
         return;
       }
