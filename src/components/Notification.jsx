@@ -5,12 +5,23 @@ const Notification = () => {
   const [sender, setSender] = useState("HOD");
   const [receiver, setReceiver] = useState([]);
   const [message, setMessage] = useState("");
+
+  // Video states
   const [hasVideo, setHasVideo] = useState(false);
   const [videoTitle, setVideoTitle] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
-  const [loading, setLoading] = useState(false);
   const [videoUploading, setVideoUploading] = useState(false);
+
+  // Image states
+  const [hasImage, setHasImage] = useState(false);
+  const [imageTitle, setImageTitle] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+
+  // General states
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -27,26 +38,46 @@ const Notification = () => {
     "4-b",
   ];
 
+  // Video file handling
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file size (100MB limit for free Cloudinary)
       if (file.size > 100 * 1024 * 1024) {
         showToastMessage("Video file must be less than 100MB", "error");
         return;
       }
 
-      // Validate file type
       if (!file.type.startsWith("video/")) {
         showToastMessage("Please select a valid video file", "error");
         return;
       }
 
       setVideoFile(file);
-      setVideoUrl(""); // Reset video URL when new file is selected
+      setVideoUrl("");
     }
   };
 
+  // Image file handling
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        // 10MB limit for images
+        showToastMessage("Image file must be less than 10MB", "error");
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        showToastMessage("Please select a valid image file", "error");
+        return;
+      }
+
+      setImageFile(file);
+      setImageUrl("");
+    }
+  };
+
+  // Video upload
   const handleVideoUpload = async () => {
     if (!videoFile || !videoTitle.trim()) {
       showToastMessage(
@@ -60,9 +91,9 @@ const Notification = () => {
 
     const formData = new FormData();
     formData.append("file", videoFile);
-    formData.append("upload_preset", "kietDisplay"); // Same preset as images
-    formData.append("folder", "kiet/videos"); // Separate folder for videos
-    formData.append("resource_type", "video"); // Important: specify video resource type
+    formData.append("upload_preset", "kietDisplay");
+    formData.append("folder", "kiet/videos");
+    formData.append("resource_type", "video");
 
     try {
       const res = await axios.post(
@@ -80,6 +111,40 @@ const Notification = () => {
     }
   };
 
+  // Image upload
+  const handleImageUpload = async () => {
+    if (!imageFile || !imageTitle.trim()) {
+      showToastMessage(
+        "Please enter an image title and select an image file.",
+        "error"
+      );
+      return;
+    }
+
+    setImageUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", imageFile);
+    formData.append("upload_preset", "kietDisplay");
+    formData.append("folder", "kiet/images");
+    formData.append("resource_type", "image");
+
+    try {
+      const res = await axios.post(
+        import.meta.env.VITE_CLOUDINARY_URL,
+        formData
+      );
+      const uploadedImageUrl = res.data.secure_url;
+      setImageUrl(uploadedImageUrl);
+      showToastMessage("Image uploaded successfully!", "success");
+    } catch (err) {
+      console.error("Image upload error:", err);
+      showToastMessage("Failed to upload image. Please try again.", "error");
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -94,14 +159,14 @@ const Notification = () => {
       return;
     }
 
-    if (hasVideo && !videoTitle.trim()) {
-      showToastMessage("Please enter a video title", "error");
+    if (hasVideo && (!videoTitle.trim() || !videoUrl)) {
+      showToastMessage("Please complete video upload", "error");
       setLoading(false);
       return;
     }
 
-    if (hasVideo && !videoUrl) {
-      showToastMessage("Please upload the video first", "error");
+    if (hasImage && (!imageTitle.trim() || !imageUrl)) {
+      showToastMessage("Please complete image upload", "error");
       setLoading(false);
       return;
     }
@@ -114,6 +179,9 @@ const Notification = () => {
         hasVideo,
         videoTitle: hasVideo ? videoTitle : null,
         videoUrl: hasVideo ? videoUrl : null,
+        hasImage,
+        imageTitle: hasImage ? imageTitle : null,
+        imageUrl: hasImage ? imageUrl : null,
       });
 
       showToastMessage("Notification sent successfully!", "success");
@@ -125,6 +193,10 @@ const Notification = () => {
       setVideoTitle("");
       setVideoFile(null);
       setVideoUrl("");
+      setHasImage(false);
+      setImageTitle("");
+      setImageFile(null);
+      setImageUrl("");
     } catch (err) {
       console.error("Error posting notification:", err);
       showToastMessage(
@@ -210,6 +282,89 @@ const Notification = () => {
             placeholder="Enter your message here..."
             required
           />
+        </div>
+
+        {/* Image Upload Section */}
+        <div className="mb-4">
+          <label className="flex items-center space-x-2 mb-3">
+            <input
+              type="checkbox"
+              checked={hasImage}
+              onChange={(e) => setHasImage(e.target.checked)}
+            />
+            <span className="font-semibold">Include Image</span>
+          </label>
+
+          {hasImage && (
+            <div className="space-y-3 border p-4 rounded bg-white mb-4">
+              <div>
+                <label className="block mb-1 font-semibold text-sm">
+                  Image Title
+                </label>
+                <input
+                  type="text"
+                  value={imageTitle}
+                  onChange={(e) => setImageTitle(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter image title"
+                  required={hasImage}
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 font-semibold text-sm">
+                  Select Image File
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <p className="text-xs text-gray-600 mb-2">
+                  Max file size: 10MB. Supported formats: JPG, PNG, GIF, etc.
+                </p>
+
+                {imageFile && !imageUrl && (
+                  <button
+                    type="button"
+                    onClick={handleImageUpload}
+                    disabled={imageUploading}
+                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 disabled:bg-green-300"
+                  >
+                    {imageUploading ? "Uploading..." : "Upload Image"}
+                  </button>
+                )}
+              </div>
+
+              {imageFile && (
+                <div className="text-sm text-blue-600">
+                  Selected: {imageFile.name} (
+                  {(imageFile.size / (1024 * 1024)).toFixed(2)} MB)
+                </div>
+              )}
+
+              {imageUrl && (
+                <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
+                  ✅ Image uploaded successfully! Ready to send notification.
+                </div>
+              )}
+
+              {imageUrl && (
+                <div className="mt-3">
+                  <label className="block mb-1 font-semibold text-sm">
+                    Image Preview
+                  </label>
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="w-full max-h-40 object-contain rounded border"
+                    style={{ maxHeight: "160px" }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Video Upload Section */}
@@ -299,7 +454,9 @@ const Notification = () => {
 
         <button
           type="submit"
-          disabled={loading || (hasVideo && !videoUrl)}
+          disabled={
+            loading || (hasVideo && !videoUrl) || (hasImage && !imageUrl)
+          }
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300 w-full"
         >
           {loading ? "Sending..." : "Send Notification"}
