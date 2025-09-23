@@ -53,12 +53,13 @@ const Notification = () => {
   const { toast, showToast, hideToast } = useToast();
 
   const receiverOptions = [
-    {value : "046"},
-    {value : "047"},
-    {value : "048"},
-    {value : "116"},
-    {value : "117"},
-    {value : "118"},
+    {value : "d-046", label : "D-046"},
+    {value : "d-047", label : "D-047"},
+    {value : "d-048", label : "D-048"},
+    {value : "d-116", label : "D-116"},
+    {value : "d-117", label : "D-117"},
+    {value : "d-118", label : "D-118"},
+    {value : "c-219", label : "C-219"},
   ];
 
   // All handler functions remain exactly the same
@@ -344,7 +345,7 @@ const Notification = () => {
                                 onChange={() => handleReceiverToggle(option.value)}
                                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 flex-shrink-0"
                               />
-                              <span className="text-base sm:text-lg flex-shrink-0">Room No : {option.value}</span>
+                              <span className="text-base sm:text-lg flex-shrink-0">Room No : {option.label}</span>
                             </label>
                           );
                         })}
