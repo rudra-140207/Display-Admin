@@ -53,15 +53,12 @@ const Notification = () => {
   const { toast, showToast, hideToast } = useToast();
 
   const receiverOptions = [
-    { value: "ALL", label: "All Classes", description: "Send to everyone", icon: "🏫", color: "purple" },
-    { value: "1-a", label: "1st Year - Section A", description: "First year students", icon: "1️⃣", color: "blue" },
-    { value: "1-b", label: "1st Year - Section B", description: "First year students", icon: "1️⃣", color: "blue" },
-    { value: "2-a", label: "2nd Year - Section A", description: "Second year students", icon: "2️⃣", color: "green" },
-    { value: "2-b", label: "2nd Year - Section B", description: "Second year students", icon: "2️⃣", color: "green" },
-    { value: "3-a", label: "3rd Year - Section A", description: "Third year students", icon: "3️⃣", color: "yellow" },
-    { value: "3-b", label: "3rd Year - Section B", description: "Third year students", icon: "3️⃣", color: "yellow" },
-    { value: "4-a", label: "4th Year - Section A", description: "Final year students", icon: "4️⃣", color: "red" },
-    { value: "4-b", label: "4th Year - Section B", description: "Final year students", icon: "4️⃣", color: "red" },
+    {value : "046"},
+    {value : "047"},
+    {value : "048"},
+    {value : "116"},
+    {value : "117"},
+    {value : "118"},
   ];
 
   // All handler functions remain exactly the same
@@ -347,11 +344,7 @@ const Notification = () => {
                                 onChange={() => handleReceiverToggle(option.value)}
                                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 flex-shrink-0"
                               />
-                              <span className="text-base sm:text-lg flex-shrink-0">{option.icon}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{option.value}</div>
-                                <div className="text-xs text-gray-500 truncate">{option.label}</div>
-                              </div>
+                              <span className="text-base sm:text-lg flex-shrink-0">Room No : {option.value}</span>
                             </label>
                           );
                         })}
