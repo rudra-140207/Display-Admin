@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import {
   Send,
@@ -9,60 +9,112 @@ import {
   Users,
   MessageSquare,
   CheckCircle2,
-  AlertCircle,
   X,
-  Play,
-  Eye,
   Loader2,
   FileText,
   Trash2,
   ChevronDown,
   Plus,
-  Minus
+  Minus,
+  Clock,
+  History,
+  Cloud,
 } from "lucide-react";
-import Toast from "./Toast"; // Import the Toast component
-import useToast from "../hooks/useToast"; // Import the custom hook
+import Toast from "./Toast";
+import useToast from "../hooks/useToast";
 
 const Notification = () => {
   const [sender, setSender] = useState("HOD");
   const [receiver, setReceiver] = useState([]);
   const [message, setMessage] = useState("");
-
-  // Video states
   const [hasVideo, setHasVideo] = useState(false);
   const [videoTitle, setVideoTitle] = useState("");
   const [videoFile, setVideoFile] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [videoUploading, setVideoUploading] = useState(false);
-
-  // Image states
   const [hasImage, setHasImage] = useState(false);
   const [imageTitle, setImageTitle] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
-
-  // General states
   const [loading, setLoading] = useState(false);
-  
-  // Dropdown states
+  const [recentMessages, setRecentMessages] = useState([]);
+  const [showRecentMessages, setShowRecentMessages] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [cloudAssets, setCloudAssets] = useState([]);
+  const [showCloudAssets, setShowCloudAssets] = useState(false);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+  const [deletingAssetId, setDeletingAssetId] = useState(null);
   const [recipientDropdownOpen, setRecipientDropdownOpen] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
 
-  // Toast management
   const { toast, showToast, hideToast } = useToast();
 
   const receiverOptions = [
-    {value : "d-046", label : "D-046"},
-    {value : "d-047", label : "D-047"},
-    {value : "d-048", label : "D-048"},
-    {value : "d-116", label : "D-116"},
-    {value : "d-117", label : "D-117"},
-    {value : "d-118", label : "D-118"},
-    {value : "c-219", label : "C-219"},
+    {value: "d-046", label: "D-046"},
+    {value: "d-047", label: "D-047"},
+    {value: "d-048", label: "D-048"},
+    {value: "d-116", label: "D-116"},
+    {value: "d-117", label: "D-117"},
+    {value: "d-118", label: "D-118"},
+    {value: "c-219", label: "C-219"},
   ];
 
-  // All handler functions remain exactly the same
+  // Function to build Cloudinary URL from public_id
+  const buildCloudinaryUrl = (publicId, resourceType = 'image') => {
+    if (!publicId) return null;
+    return publicId;
+  };
+
+  const fetchRecentMessages = async () => {
+    setLoadingMessages(true);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_baseUrl}/api/notification/recent/${sender}`);
+      setRecentMessages(response.data.messages);
+    } catch (error) {
+      showToast('Failed to fetch recent messages', 'error');
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const fetchCloudAssets = async () => {
+    setLoadingAssets(true);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_baseUrl}/api/notification/assets/${sender}`);
+      console.log(response.data);
+      setCloudAssets(response.data.assets);
+    } catch (error) {
+      showToast('Failed to fetch cloud assets', 'error');
+    } finally {
+      setLoadingAssets(false);
+    }
+  };
+
+  const deleteCloudAsset = async (asset) => {
+    if (!confirm(`Are you sure you want to delete this ${asset.type} from cloud storage?`)) {
+      return;
+    }
+
+    setDeletingAssetId(asset.id);
+    try {
+      await axios.delete(`${import.meta.env.VITE_baseUrl}/api/notification/asset`, {
+        data: {
+          publicId: asset.publicId,
+          resourceType: asset.type
+        }
+      });
+      
+      setCloudAssets(cloudAssets.filter(a => a.id !== asset.id));
+      showToast(`${asset.type} deleted successfully`, 'success');
+    } catch (error) {
+      showToast(`Failed to delete ${asset.type}`, 'error');
+    } finally {
+      setDeletingAssetId(null);
+    }
+  };
+
+  // Keep all your existing handlers (handleVideoFileChange, handleImageFileChange, etc.)
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -115,11 +167,9 @@ const Notification = () => {
 
     try {
       const res = await axios.post(import.meta.env.VITE_CLOUDINARY_VIDEO_URL, formData);
-      const uploadedVideoUrl = res.data.secure_url;
-      setVideoUrl(uploadedVideoUrl);
+      setVideoUrl(res.data.url);
       showToast("Video uploaded successfully!", "success");
     } catch (err) {
-      console.error("Video upload error:", err);
       showToast("Failed to upload video. Please try again.", "error");
     } finally {
       setVideoUploading(false);
@@ -142,11 +192,10 @@ const Notification = () => {
 
     try {
       const res = await axios.post(import.meta.env.VITE_CLOUDINARY_URL, formData);
-      const uploadedImageUrl = res.data.secure_url;
-      setImageUrl(uploadedImageUrl);
+      console.log(res.data);
+      setImageUrl(res.data.url);
       showToast("Image uploaded successfully!", "success");
     } catch (err) {
-      console.error("Image upload error:", err);
       showToast("Failed to upload image. Please try again.", "error");
     } finally {
       setImageUploading(false);
@@ -157,7 +206,6 @@ const Notification = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Validation
     if (receiver.length === 0) {
       showToast("Please select at least one receiver", "error");
       setLoading(false);
@@ -191,7 +239,6 @@ const Notification = () => {
 
       showToast("🎉 Notification sent successfully!", "success");
 
-      // Reset form
       setTimeout(() => {
         setReceiver([]);
         setMessage("");
@@ -204,9 +251,15 @@ const Notification = () => {
         setImageFile(null);
         setImageUrl("");
         setShowAttachments(false);
+        
+        if (showRecentMessages) {
+          fetchRecentMessages();
+        }
+        if (showCloudAssets) {
+          fetchCloudAssets();
+        }
       }, 1500);
     } catch (err) {
-      console.error("Error posting notification:", err);
       showToast("Failed to send notification. Please try again.", "error");
     } finally {
       setLoading(false);
@@ -229,9 +282,12 @@ const Notification = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 px-4 py-6 sm:px-6 lg:px-8">
-      {/* Enhanced Toast Component */}
       <Toast 
         message={toast.message}
         type={toast.type}
@@ -242,7 +298,6 @@ const Notification = () => {
       />
 
       <div className="max-w-4xl mx-auto">
-        {/* Header - Mobile Optimized */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex flex-col items-center space-y-3 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-3 mb-4">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
@@ -253,10 +308,175 @@ const Notification = () => {
               <p className="text-gray-600 text-sm sm:text-base lg:text-lg mt-1">Create and send notifications to students</p>
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => {
+                setShowRecentMessages(!showRecentMessages);
+                if (!showRecentMessages && recentMessages.length === 0) {
+                  fetchRecentMessages();
+                }
+              }}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <History className="w-4 h-4" />
+              <span>{showRecentMessages ? 'Hide' : 'Show'} Recent Messages</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setShowCloudAssets(!showCloudAssets);
+                if (!showCloudAssets && cloudAssets.length === 0) {
+                  fetchCloudAssets();
+                }
+              }}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Cloud className="w-4 h-4" />
+              <span>{showCloudAssets ? 'Hide' : 'Show'} Cloud Assets</span>
+            </button>
+          </div>
         </div>
 
-        {/* Main Form */}
+        {/* Recent Messages Section (No Delete) */}
+        {showRecentMessages && (
+          <div className="mb-8 bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4">
+              <h3 className="text-white font-semibold text-lg flex items-center space-x-2">
+                <History className="w-5 h-5" />
+                <span>Recent Messages</span>
+              </h3>
+            </div>
+            
+            <div className="p-6">
+              {loadingMessages ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="animate-spin w-6 h-6 text-blue-600" />
+                </div>
+              ) : recentMessages.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">No recent messages found</p>
+              ) : (
+                <div className="space-y-4">
+                  {recentMessages.map((msg) => (
+                    <div key={msg._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="mb-2">
+                        <p className="font-medium text-gray-800 mb-1">{msg.message}</p>
+                        <div className="text-sm text-gray-500 space-y-1">
+                          <p className="flex items-center space-x-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{formatDate(msg.createdAt)}</span>
+                          </p>
+                          <p>Recipients: {msg.recipients?.join(', ') || 'N/A'} ({msg.count} total)</p>
+                        </div>
+                      </div>
+                      
+                      {(msg.hasImage || msg.hasVideo) && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {msg.hasImage && (
+                            <span className="inline-flex items-center space-x-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs">
+                              <ImageIcon className="w-3 h-3" />
+                              <span>{msg.imageTitle}</span>
+                            </span>
+                          )}
+                          {msg.hasVideo && (
+                            <span className="inline-flex items-center space-x-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs">
+                              <Video className="w-3 h-3" />
+                              <span>{msg.videoTitle}</span>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Cloud Assets Section */}
+        {showCloudAssets && (
+          <div className="mb-8 bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4">
+              <h3 className="text-white font-semibold text-lg flex items-center space-x-2">
+                <Cloud className="w-5 h-5" />
+                <span>Cloud Assets</span>
+              </h3>
+            </div>
+            
+            <div className="p-6">
+              {loadingAssets ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="animate-spin w-6 h-6 text-green-600" />
+                </div>
+              ) : cloudAssets.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">No cloud assets found</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {cloudAssets.map((asset) => (
+                    <div key={asset.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="aspect-video bg-gray-100 rounded-lg mb-3 overflow-hidden relative">
+                        {asset.type === 'image' ? (
+                          <img 
+                            src={buildCloudinaryUrl(asset.publicId, 'image')} 
+                            alt={asset.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y3ZjdmNyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5Ij5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
+                            }}
+                          />
+                        ) : (
+                          <video 
+                            src={buildCloudinaryUrl(asset.publicId, 'video')} 
+                            className="w-full h-full object-cover"
+                            controls
+                            poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzAwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIj5WaWRlbzwvdGV4dD48L3N2Zz4="
+                          />
+                        )}
+                        
+                        <div className="absolute top-2 right-2">
+                          <button
+                            onClick={() => deleteCloudAsset(asset)}
+                            disabled={deletingAssetId === asset.id}
+                            className="bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-colors disabled:opacity-50"
+                          >
+                            {deletingAssetId === asset.id ? (
+                              <Loader2 className="animate-spin w-4 h-4" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                        
+                        <div className="absolute bottom-2 left-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            asset.type === 'image' 
+                              ? 'bg-blue-100 text-blue-700' 
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {asset.type === 'image' ? <ImageIcon className="w-3 h-3 inline mr-1" /> : <Video className="w-3 h-3 inline mr-1" />}
+                            {asset.type}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium text-gray-800 mb-1 truncate">{asset.title}</h4>
+                        <p className="text-sm text-gray-500 mb-2 truncate">{asset.message}</p>
+                        <p className="text-xs text-gray-400">{formatDate(asset.createdAt)}</p>
+                        <p className="text-xs text-gray-400 truncate mt-1">ID: {asset.publicId}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Your existing form remains the same */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl overflow-hidden">
+          {/* Keep all your existing form JSX here - sender, recipients, message, attachments, submit button */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4">
             <h2 className="text-white font-semibold text-base sm:text-lg flex items-center space-x-2">
               <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -265,9 +485,7 @@ const Notification = () => {
           </div>
 
           <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-            {/* Two Column Layout for Sender and Recipients - Mobile Stacked */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {/* Sender Input Field */}
               <div className="space-y-2">
                 <label className="flex items-center space-x-2 text-base sm:text-lg font-semibold text-gray-700">
                   <User className="text-blue-600 w-4 h-4 sm:w-5 sm:h-5" />
@@ -283,7 +501,6 @@ const Notification = () => {
                 />
               </div>
 
-              {/* Recipients Dropdown */}
               <div className="space-y-2">
                 <label className="flex items-center space-x-2 text-base sm:text-lg font-semibold text-gray-700">
                   <Users className="text-blue-600 w-4 h-4 sm:w-5 sm:h-5" />
@@ -317,7 +534,6 @@ const Notification = () => {
 
                   {recipientDropdownOpen && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg sm:rounded-xl shadow-xl z-20 overflow-hidden">
-                      {/* Select All Button */}
                       <div className="p-2 border-b border-gray-100">
                         <button
                           type="button"
@@ -328,7 +544,6 @@ const Notification = () => {
                         </button>
                       </div>
                       
-                      {/* Recipients List */}
                       <div className="max-h-48 sm:max-h-64 overflow-y-auto">
                         {receiverOptions.map((option) => {
                           const isSelected = receiver.includes(option.value);
@@ -356,7 +571,6 @@ const Notification = () => {
               </div>
             </div>
 
-            {/* Selected Recipients Display */}
             {receiver.length > 0 && (
               <div className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200">
                 <p className="text-blue-700 font-medium mb-2 flex items-center space-x-2 text-sm sm:text-base">
@@ -383,7 +597,6 @@ const Notification = () => {
               </div>
             )}
 
-            {/* Message Input */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-base sm:text-lg font-semibold text-gray-700">
                 <MessageSquare className="text-blue-600 w-4 h-4 sm:w-5 sm:h-5" />
@@ -402,7 +615,6 @@ const Notification = () => {
               </div>
             </div>
 
-            {/* Attachments Section */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-700 flex items-center space-x-2">
@@ -426,7 +638,6 @@ const Notification = () => {
 
               {showAttachments && (
                 <div className="space-y-3 sm:space-y-4 bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200">
-                  {/* Attachment Type Selector */}
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                     <button
                       type="button"
@@ -455,7 +666,6 @@ const Notification = () => {
                     </button>
                   </div>
 
-                  {/* Image Upload Section */}
                   {hasImage && (
                     <div className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-blue-200">
                       <div className="flex items-center justify-between mb-3">
@@ -513,7 +723,18 @@ const Notification = () => {
                               <span>Image uploaded successfully!</span>
                             </div>
                             <div className="relative rounded-lg overflow-hidden border border-blue-200">
-                              <img src={imageUrl} alt="Preview" className="w-full max-h-24 sm:max-h-32 object-contain bg-white" />
+                              <img 
+                                src={buildCloudinaryUrl(imageUrl, 'image')} 
+                                alt="Preview" 
+                                className="w-full max-h-24 sm:max-h-32 object-contain bg-white" 
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                              <div className="hidden items-center justify-center h-24 sm:h-32 bg-gray-100 text-gray-500 text-sm">
+                                Public ID: {imageUrl}
+                              </div>
                               <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded-md text-xs font-medium">
                                 ✓ Ready
                               </div>
@@ -524,7 +745,6 @@ const Notification = () => {
                     </div>
                   )}
 
-                  {/* Video Upload Section */}
                   {hasVideo && (
                     <div className="bg-purple-50 rounded-lg p-3 sm:p-4 border border-purple-200">
                       <div className="flex items-center justify-between mb-3">
@@ -582,7 +802,18 @@ const Notification = () => {
                               <span>Video uploaded successfully!</span>
                             </div>
                             <div className="relative rounded-lg overflow-hidden border border-purple-200">
-                              <video src={videoUrl} controls className="w-full max-h-24 sm:max-h-32 bg-black" />
+                              <video 
+                                src={buildCloudinaryUrl(videoUrl, 'video')} 
+                                controls 
+                                className="w-full max-h-24 sm:max-h-32 bg-black"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                              <div className="hidden items-center justify-center h-24 sm:h-32 bg-gray-100 text-gray-500 text-sm">
+                                Public ID: {videoUrl}
+                              </div>
                               <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded-md text-xs font-medium">
                                 ✓ Ready
                               </div>
@@ -596,7 +827,6 @@ const Notification = () => {
               )}
             </div>
 
-            {/* Submit Button */}
             <div className="pt-2">
               <button
                 type="submit"
