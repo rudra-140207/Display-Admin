@@ -58,6 +58,7 @@ const Notification = () => {
     {value: "d-117", label: "D-117"},
     {value: "d-118", label: "D-118"},
     {value: "c-219", label: "C-219"},
+    {value: "c-112", label: "Dean Office"},
   ];
 
   // Function to build Cloudinary URL from public_id
